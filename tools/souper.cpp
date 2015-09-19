@@ -17,7 +17,7 @@
 #include "llvm/Bitcode/ReaderWriter.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
-#include "llvm/PassManager.h"
+#include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/DataStream.h"
 #include "llvm/Support/Debug.h"
@@ -72,10 +72,9 @@ int main(int argc, char **argv) {
   std::unique_ptr<Module> M;
 
   // Use the bitcode streaming interface
-  DataStreamer *streamer = getDataFileStreamer(InputFilename, &ErrorMessage);
-  if (streamer) {
-    auto ModOrError = getStreamedBitcodeModule(DisplayFilename, streamer,
-                                               Context);
+  if (auto streamer = getDataFileStreamer(InputFilename, &ErrorMessage)) {
+    auto ModOrError = getStreamedBitcodeModule(DisplayFilename,
+                                               std::move(streamer), Context);
     if (auto EC = ModOrError.getError())
       ErrorMessage = EC.message();
     else

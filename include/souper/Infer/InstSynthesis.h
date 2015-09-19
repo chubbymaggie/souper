@@ -145,7 +145,8 @@ private:
   std::vector<Component> ConstComps;
   /// Program inputs
   std::vector<Inst *> Inputs;
-  std::set<unsigned> InputWidths;
+  /// Default component width
+  unsigned DefaultWidth = 0;
   /// Input location set I
   std::vector<LocInst> I;
   /// Component input location set P
@@ -176,10 +177,6 @@ private:
 
   /// Initalize input variable locations
   void initInputVars(InstContext &IC);
-
-  /// Add extra width manipulations components (zext/sext/trunc)
-  /// to handle varying input/output widths
-  void addZSTComps();
 
   /// Initalize components' input locations, output locations,
   /// and components' concrete instruction instances
@@ -285,10 +282,12 @@ private:
   std::vector<LocVar> getOpLocs(const LocVar &Loc);
   std::vector<std::string> splitString(const char *S, char Del=',');
   bool isWiringInvalid(const LocVar &Left, const LocVar &Right);
+  void forbidInvalidCandWiring(const ProgramWiring &CandWiring,
+                               std::vector<InstMapping> &LoopPCs,
+                               InstContext &IC);
   int costHelper(Inst *I, std::set<Inst *> &Visited);
   int cost(Inst *I);
   bool hasConst(Inst *I);
-  bool hasOtherWidthComps(Inst *I);
 
 };
 
